@@ -13,17 +13,17 @@ struct Process
     int finishTime;     // time when finished
 };
 
-void findWaitingTime(Process proc[], int numberOfProcesses, int waitTime[])
+void findWaitingTime(Process proc[], int numberOfProcesses, int waitTime[] , int turnaroundTime[])
 {
     // calculating waiting time, loop through all processes, add the lastproc waitime + lastproc burst time to get current proc wait time.
     for(int idx = 0; idx < numberOfProcesses; idx++)
     {
         // do the math
-        waitTime[ idx ] = (proc[idx].finishTime - proc[idx].arrivalTime) - proc[idx].burstTime;
+        waitTime[ idx ] = turnaroundTime[idx] - proc[idx].burstTime;
     }
 }
 
-void findTurnaroundTime(Process proc[], int numberOfProcesses, int waitTime[], int turnaroundTime[])
+void findTurnaroundTime(Process proc[], int numberOfProcesses, int turnaroundTime[])
 {
     // loop through all the other processes, calculate burst time by adding the waittime of the proc + the burst time of the proc.
     for(int idx = 0; idx < numberOfProcesses; idx++)
@@ -54,9 +54,9 @@ void findavgTime(Process proc[], int numberOfProcesses)
     });
 
     // Your function to find turnaround time for all processes
-    findTurnaroundTime(proc, numberOfProcesses, waitTime, turnaroundTime);
+    findTurnaroundTime(proc, numberOfProcesses, turnaroundTime);
     // Your function to find waiting time of all processes
-    findWaitingTime(proc, numberOfProcesses, waitTime);
+    findWaitingTime(proc, numberOfProcesses, waitTime, turnaroundTime);
     // Your function to display all details
     displayProcessList(proc, numberOfProcesses, waitTime, turnaroundTime);
 
