@@ -40,7 +40,7 @@ void displayProcessList(Process proc[], int numberOfProcesses, int waitTime [], 
     // loop through all the processes, printing the information we've calculated about them.
     for(int idx = 0; idx < numberOfProcesses; idx++)
     {
-        printf(" %3d \t      %3d \t     %3d \t     %3d\n" , proc[idx].pid+1 , proc[idx].finishTime , turnaroundTime[idx] , waitTime[idx] );
+        printf(" %3d \t      %3d \t     %3d \t     %3d\n" , proc[idx].pid , proc[idx].finishTime , turnaroundTime[idx] , waitTime[idx] );
         // printf(" %d \t\t %d \t\t %d \t\t %d\n" , proc[idx].pid+1 , proc[idx].finishTime , proc[idx].finishTime - proc[idx].arrivalTime , (proc[idx].finishTime - proc[idx].arrivalTime) - proc[idx].burstTime );
     }
 }
@@ -124,15 +124,19 @@ int executeProcess( Process* proc , int elapsed )
 {
     int removedProcesses = 0;
 
-    // decrement remaining
+    // decrement remaining time by 1ms
     proc->remainingTime--;
+
+    // printf("e: %d executed: %d , remaining time: %d\n",elapsed, proc->pid,proc->remainingTime);
 
     // check if proc is finished
     if ( proc->remainingTime==0 ) {
         removedProcesses++;
+        
         proc->finishTime = elapsed + 1;
+
+        // printf("PROCESS %d DONE AT %d\n",proc->pid , elapsed+1);
     }
-    
 
     return removedProcesses;
 }
@@ -141,20 +145,13 @@ int executeProcess( Process* proc , int elapsed )
 int main()
 {
     int arriv[] = {0,1,2,3,4,5};
-    // int burst[] = {7,5,3,1,2,1}; 
-    int burst[] = {8,4,2,1,3,2}; 
+    int burst[] = {7,5,3,1,2,1}; 
+    // int burst[] = {8,4,2,1,3,2}; // these are from
+
     int numberOfProcesses = sizeof arriv / sizeof arriv[0];
 
     // Generate Process structs
     Process proc[numberOfProcesses] ;//= {{1, 6}, {2, 8}, {3, 7}, {4, 3}, {5,4}};
-    // std::vector<
-    // for(int i = 0; i < numberOfProcesses; i++)
-    // {
-    //     proc[ i ] = Process{ i , arriv[i] , burst[i] };
-    //     // printf(proc[i]);
-    // }
-    
-    // int waitTime[numberOfProcesses], turnaroundTime[numberOfProcesses];
 
     // elapsed represents the amount of time that has elapsed ( 1 iteration of loop = 1 unit of time = elapsed +1)
     int elapsed = 0;
@@ -166,43 +163,15 @@ int main()
 
         // sort currently added processes
         sorting( proc , finishedProcesses , processCount);
-        // cout << "Order in which process gets executed\n";
-        // for (int i = 0 ; i < processCount; i++)
-            // cout << proc[i].pid <<" ";
-        // cout <<"\n";
 
         // Get process to execute, will be first in array after sorting
         Process* currentProc = &proc[finishedProcesses];
-        // printf("Selected proc: %d %d %d\n",currentProc->pid,processCount ,finishedProcesses);
-        // displayProcessList(proc, numberOfProcesses, waitTime, turnaroundTime);
 
-        // printf("main loop before exec %d %d\n",currentProc->pid , currentProc->remainingTime);
         // execute the selected process
         finishedProcesses += executeProcess( currentProc , elapsed );
-        // printf("main loop %d %d\n",currentProc->pid , currentProc->remainingTime);
 
-
-
-
-
-        printf("-----------\n");
         elapsed ++;
     }
-    
-
-    // Your function to find waiting time of all processes
-    // findWaitingTime(proc, numberOfProcesses, waitTime);
-    // Your function to find turnaround time for all processes
-    // findTurnaroundTime(proc, numberOfProcesses, waitTime, turnaroundTime);
-    // Your function to display all details
-
-    // sort our processes.
-    // sorting(proc, numberOfProcesses);
-
-    // cout << "\nOrder in which process gets executed\n";
-    // for (int i = 0 ; i < processCount; i++)
-        // cout << proc[i].pid <<" ";
-
 
     // calc avg times.
     findavgTime(proc, numberOfProcesses);
