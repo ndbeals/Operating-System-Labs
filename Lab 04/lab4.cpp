@@ -1,0 +1,239 @@
+#include <iostream>
+#include <algorithm>
+
+using namespace std;
+
+// Process struct defn'
+struct Process
+{
+    int pid;            // Process ID
+    int arrivalTime;    // Arrival time
+    int burstTime;      // Burst Time
+    int remainingTime;  // 
+    int finishTime;     // time when finished
+};
+
+void findWaitingTime(Process proc[], int numberOfProcesses, int waitTime[])
+{
+    // waiting time for first process is 0
+    // waitTime[0] = 0;
+
+    // calculating waiting time, loop through all processes, add the lastproc waitime + lastproc burst time to get current proc wait time.
+    for(int idx = 0; idx < numberOfProcesses; idx++)
+    {
+        // lastProc variable to make it more readable
+        // Process lastProc = proc[idx - 1];
+        // do the math
+        // waitTime[ idx ] = lastProc.burstTime + waitTime[ idx - 1 ];
+        waitTime[ idx ] = (proc[idx].finishTime - proc[idx].arrivalTime) - proc[idx].burstTime;
+    }
+}
+
+void findTurnaroundTime(Process proc[], int numberOfProcesses, int waitTime[], int turnaroundTime[])
+{
+    // wait time for first process is just the burst time.
+    // turnaroundTime[0] = proc[0].burstTime;
+
+    // loop through all the other processes, calculate burst time by adding the waittime of the proc + the burst time of the proc.
+    for(int idx = 0; idx < numberOfProcesses; idx++)
+    {
+        // curProc variable to make code more readable
+        // Process curProc = proc[ idx ];
+        // do the math
+        // turnaroundTime[ idx ] = curProc.finishTime - curProc.arrivalTime;
+        turnaroundTime[ idx ] = proc[idx].finishTime - proc[idx].arrivalTime;
+        printf("incalc %d - %d \n",proc[idx].finishTime ,proc[idx].arrivalTime);
+        
+    }
+}
+
+void displayProcessList(Process proc[], int numberOfProcesses, int waitTime [], int turnaroundTime [])
+{
+    // Write code to Display processes along with all details (Process ID, Burst Time, Waiting Time, Turnaround Time)
+    printf("\nProcess   Finish Time   Turnaround Time   Waiting Time\n");
+    // loop through all the processes, printing the information we've calculated about them.
+
+    // sort through process list to make them numerical before executing
+    // std::sort( &proc[0] ,&proc[numberOfProcesses], [](Process a, Process b) {
+        // return a.pid < b.pid;   
+    // });
+
+    for(int idx = 0; idx < numberOfProcesses; idx++)
+    {
+        printf(" %3d \t      %3d \t     %3d \t     %3d\n" , proc[idx].pid+1 , proc[idx].finishTime , turnaroundTime[idx] , waitTime[idx] );
+        // printf(" %d \t\t %d \t\t %d \t\t %d\n" , proc[idx].pid+1 , proc[idx].finishTime , proc[idx].finishTime - proc[idx].arrivalTime , (proc[idx].finishTime - proc[idx].arrivalTime) - proc[idx].burstTime );
+    }
+}
+
+void findavgTime(Process proc[], int numberOfProcesses)
+{
+    int waitTime[numberOfProcesses], turnaroundTime[numberOfProcesses];
+
+    // sort through process list to make them ascending by pid before executing
+    std::sort( &proc[0] ,&proc[numberOfProcesses], [](Process a, Process b) {
+        return a.pid < b.pid;   
+    });
+
+    // Your function to find turnaround time for all processes
+    findTurnaroundTime(proc, numberOfProcesses, waitTime, turnaroundTime);
+    // Your function to find waiting time of all processes
+    findWaitingTime(proc, numberOfProcesses, waitTime);
+    // Your function to display all details
+    displayProcessList(proc, numberOfProcesses, waitTime, turnaroundTime);
+
+
+    // Calculate Average Waiting Time
+    // calc avg turnaround
+    float avgWaitTime = 0;
+    float avgTurnTime = 0;
+
+    // loop through processes, adding all the waittimes and turnaround times
+    for(int idx = 0; idx < numberOfProcesses; idx++)
+    {
+        avgWaitTime += (float)waitTime[idx];
+        avgTurnTime += (float)turnaroundTime[idx];
+    }
+    // divide by the # of processes to get a mean.
+    avgWaitTime /= numberOfProcesses;
+    avgTurnTime /= numberOfProcesses;
+    
+    printf("Average waiting time \t= %.1f ms\n",avgWaitTime);
+    printf("Average turnaround time = %.1f ms\n",avgTurnTime);
+    
+}
+
+void sorting(Process proc[] , int startPos , int numberOfProcesses)
+{
+    // Implement a basic sort algorithm which sorts only on the Burst Time value.
+    // insertion sort
+    // define temporary and loop index values;
+    int sortIdx, cmpIdx;
+    Process tmpVal;
+    for(int sortIdx = (startPos + 1); sortIdx < numberOfProcesses; sortIdx++)
+    {
+        // start comparing all elements between 1 and sortIdx.
+        cmpIdx = sortIdx;
+        
+        // sort between 1 to sortIdx, decrementing each time an insertion is made.
+        while( (cmpIdx > 0 ) && ( proc[ cmpIdx - 1 ].remainingTime > proc[ cmpIdx ].remainingTime ) ){
+            tmpVal = proc[ cmpIdx ];
+            proc[ cmpIdx ] = proc[ cmpIdx - 1 ];
+            proc[ cmpIdx - 1 ] = tmpVal;
+            cmpIdx--;
+        }
+    }
+}
+
+int addProcessByTime( Process procList[] , int elapsed ,int numberOfProcesses , int arriv[] , int burst[] )
+{
+    // int numberOfProcesses = sizeof (arriv) / sizeof arriv[0];
+    int addedProcesses = 0;
+
+    for(int i = 0; i < numberOfProcesses; i++)
+    {
+        if ( arriv[i] == elapsed ) {
+            printf("added proc %d , elap: %d  arriv: %d burst:%d\n",i,elapsed,arriv[i],burst[i]);
+            procList[ i ] = Process{ i , arriv[i] , burst[i], burst[i] };
+            addedProcesses++;
+        }
+        
+        // printf(proc[i]);
+    }
+    
+    // printf("number of procs %d\n",numberOfProcesses);
+    return addedProcesses;
+}
+
+int executeProcess( Process* proc , int elapsed )
+{
+    int removedProcesses = 0;
+
+    // printf("executing: %d , burst time: %d\n",proc->pid,proc->remainingTime);
+    // proc->remainingTime--;
+    proc->remainingTime = proc->remainingTime - 1;
+    printf("elapsed: %d executed: %d , bursted time: %d\n",elapsed,proc->pid,proc->remainingTime);
+    // proc->remainingTime--;
+    // printf("executed: %d , bursted time: %d\n",proc->pid,proc->remainingTime);
+
+    // check if proc is finished
+    if ( proc->remainingTime==0 ) {
+        removedProcesses++;
+        printf("FINISHED!\n");
+        proc->finishTime = elapsed + 1;
+    }
+    
+
+    return removedProcesses;
+}
+
+// provided main
+int main()
+{
+    int arriv[] = {0,1,2,3,4,5};
+    // int burst[] = {7,5,3,1,2,1}; 
+    int burst[] = {8,4,2,1,3,2}; 
+    int numberOfProcesses = sizeof arriv / sizeof arriv[0];
+
+    // Generate Process structs
+    Process proc[numberOfProcesses] ;//= {{1, 6}, {2, 8}, {3, 7}, {4, 3}, {5,4}};
+    // std::vector<
+    // for(int i = 0; i < numberOfProcesses; i++)
+    // {
+    //     proc[ i ] = Process{ i , arriv[i] , burst[i] };
+    //     // printf(proc[i]);
+    // }
+    
+    // int waitTime[numberOfProcesses], turnaroundTime[numberOfProcesses];
+
+    // elapsed represents the amount of time that has elapsed ( 1 iteration of loop = 1 unit of time = elapsed +1)
+    int elapsed = 0;
+    int processCount = 0;
+    int finishedProcesses = 0;
+    while( finishedProcesses < numberOfProcesses ){
+        // check for processes to add, and add them if so.
+        processCount += addProcessByTime( proc , elapsed , numberOfProcesses, arriv, burst);
+
+        // sort currently added processes
+        sorting( proc , finishedProcesses , processCount);
+        // cout << "Order in which process gets executed\n";
+        // for (int i = 0 ; i < processCount; i++)
+            // cout << proc[i].pid <<" ";
+        // cout <<"\n";
+
+        // Get process to execute, will be first in array after sorting
+        Process* currentProc = &proc[finishedProcesses];
+        // printf("Selected proc: %d %d %d\n",currentProc->pid,processCount ,finishedProcesses);
+        // displayProcessList(proc, numberOfProcesses, waitTime, turnaroundTime);
+
+        // printf("main loop before exec %d %d\n",currentProc->pid , currentProc->remainingTime);
+        // execute the selected process
+        finishedProcesses += executeProcess( currentProc , elapsed );
+        // printf("main loop %d %d\n",currentProc->pid , currentProc->remainingTime);
+
+
+
+
+
+        printf("-----------\n");
+        elapsed ++;
+    }
+    
+
+    // Your function to find waiting time of all processes
+    // findWaitingTime(proc, numberOfProcesses, waitTime);
+    // Your function to find turnaround time for all processes
+    // findTurnaroundTime(proc, numberOfProcesses, waitTime, turnaroundTime);
+    // Your function to display all details
+
+    // sort our processes.
+    // sorting(proc, numberOfProcesses);
+
+    // cout << "\nOrder in which process gets executed\n";
+    // for (int i = 0 ; i < processCount; i++)
+        // cout << proc[i].pid <<" ";
+
+
+    // calc avg times.
+    findavgTime(proc, numberOfProcesses);
+    return 0;
+}
