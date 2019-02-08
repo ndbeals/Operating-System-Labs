@@ -146,23 +146,24 @@ int main()
 {
     int arriv[] = {0,1,2,3,4,5};
     int burst[] = {7,5,3,1,2,1}; 
-    // int burst[] = {8,4,2,1,3,2}; // these are from
-
+    // int burst[] = {8,4,2,1,3,2}; // these are from the screenshot
     int numberOfProcesses = sizeof arriv / sizeof arriv[0];
 
     // Generate Process structs
-    Process proc[numberOfProcesses] ;//= {{1, 6}, {2, 8}, {3, 7}, {4, 3}, {5,4}};
+    Process proc[numberOfProcesses] ;
 
     // elapsed represents the amount of time that has elapsed ( 1 iteration of loop = 1 unit of time = elapsed +1)
     int elapsed = 0;
+    // processCount and finishedProcesses represent the end and start bounds (respectively) of the proc array
     int processCount = 0;
     int finishedProcesses = 0;
+
     while( finishedProcesses < numberOfProcesses ){
         // check for processes to add, and add them if so.
         processCount += addProcessByTime( proc , elapsed , numberOfProcesses, arriv, burst);
 
         // sort currently added processes
-        sorting( proc , finishedProcesses , processCount);
+        sorting( proc , finishedProcesses , processCount );
 
         // Get process to execute, will be first in array after sorting
         Process* currentProc = &proc[finishedProcesses];
@@ -175,5 +176,7 @@ int main()
 
     // calc avg times.
     findavgTime(proc, numberOfProcesses);
+    printf("\n");
+    
     return 0;
 }
