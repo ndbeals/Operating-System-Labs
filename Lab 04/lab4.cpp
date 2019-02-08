@@ -41,7 +41,6 @@ void displayProcessList(Process proc[], int numberOfProcesses, int waitTime [], 
     for(int idx = 0; idx < numberOfProcesses; idx++)
     {
         printf(" %3d \t      %3d \t     %3d \t     %3d\n" , proc[idx].pid , proc[idx].finishTime , turnaroundTime[idx] , waitTime[idx] );
-        // printf(" %d \t\t %d \t\t %d \t\t %d\n" , proc[idx].pid+1 , proc[idx].finishTime , proc[idx].finishTime - proc[idx].arrivalTime , (proc[idx].finishTime - proc[idx].arrivalTime) - proc[idx].burstTime );
     }
 }
 
@@ -111,7 +110,6 @@ int addProcessByTime( Process procList[] , int elapsed ,int numberOfProcesses , 
     for(int i = 0; i < numberOfProcesses; i++)
     {
         if ( arriv[i] == elapsed ) {
-            // printf("added proc %d , elap: %d  arriv: %d burst:%d\n",i,elapsed,arriv[i],burst[i]);
             procList[ i ] = Process{ i , arriv[i] , burst[i], burst[i] };
             addedProcesses++;
         }
@@ -127,15 +125,11 @@ int executeProcess( Process* proc , int elapsed )
     // decrement remaining time by 1ms
     proc->remainingTime--;
 
-    // printf("e: %d executed: %d , remaining time: %d\n",elapsed, proc->pid,proc->remainingTime);
-
     // check if proc is finished
     if ( proc->remainingTime==0 ) {
         removedProcesses++;
         
         proc->finishTime = elapsed + 1;
-
-        // printf("PROCESS %d DONE AT %d\n",proc->pid , elapsed+1);
     }
 
     return removedProcesses;
