@@ -15,35 +15,21 @@ struct Process
 
 void findWaitingTime(Process proc[], int numberOfProcesses, int waitTime[])
 {
-    // waiting time for first process is 0
-    // waitTime[0] = 0;
-
     // calculating waiting time, loop through all processes, add the lastproc waitime + lastproc burst time to get current proc wait time.
     for(int idx = 0; idx < numberOfProcesses; idx++)
     {
-        // lastProc variable to make it more readable
-        // Process lastProc = proc[idx - 1];
         // do the math
-        // waitTime[ idx ] = lastProc.burstTime + waitTime[ idx - 1 ];
         waitTime[ idx ] = (proc[idx].finishTime - proc[idx].arrivalTime) - proc[idx].burstTime;
     }
 }
 
 void findTurnaroundTime(Process proc[], int numberOfProcesses, int waitTime[], int turnaroundTime[])
 {
-    // wait time for first process is just the burst time.
-    // turnaroundTime[0] = proc[0].burstTime;
-
     // loop through all the other processes, calculate burst time by adding the waittime of the proc + the burst time of the proc.
     for(int idx = 0; idx < numberOfProcesses; idx++)
     {
-        // curProc variable to make code more readable
-        // Process curProc = proc[ idx ];
         // do the math
-        // turnaroundTime[ idx ] = curProc.finishTime - curProc.arrivalTime;
         turnaroundTime[ idx ] = proc[idx].finishTime - proc[idx].arrivalTime;
-        printf("incalc %d - %d \n",proc[idx].finishTime ,proc[idx].arrivalTime);
-        
     }
 }
 
@@ -52,12 +38,6 @@ void displayProcessList(Process proc[], int numberOfProcesses, int waitTime [], 
     // Write code to Display processes along with all details (Process ID, Burst Time, Waiting Time, Turnaround Time)
     printf("\nProcess   Finish Time   Turnaround Time   Waiting Time\n");
     // loop through all the processes, printing the information we've calculated about them.
-
-    // sort through process list to make them numerical before executing
-    // std::sort( &proc[0] ,&proc[numberOfProcesses], [](Process a, Process b) {
-        // return a.pid < b.pid;   
-    // });
-
     for(int idx = 0; idx < numberOfProcesses; idx++)
     {
         printf(" %3d \t      %3d \t     %3d \t     %3d\n" , proc[idx].pid+1 , proc[idx].finishTime , turnaroundTime[idx] , waitTime[idx] );
@@ -97,8 +77,8 @@ void findavgTime(Process proc[], int numberOfProcesses)
     avgWaitTime /= numberOfProcesses;
     avgTurnTime /= numberOfProcesses;
     
-    printf("Average waiting time \t= %.1f ms\n",avgWaitTime);
-    printf("Average turnaround time = %.1f ms\n",avgTurnTime);
+    printf("Average waiting time \t= %.2f ms\n",avgWaitTime);
+    printf("Average turnaround time = %.2f ms\n",avgTurnTime);
     
 }
 
@@ -126,21 +106,17 @@ void sorting(Process proc[] , int startPos , int numberOfProcesses)
 
 int addProcessByTime( Process procList[] , int elapsed ,int numberOfProcesses , int arriv[] , int burst[] )
 {
-    // int numberOfProcesses = sizeof (arriv) / sizeof arriv[0];
     int addedProcesses = 0;
 
     for(int i = 0; i < numberOfProcesses; i++)
     {
         if ( arriv[i] == elapsed ) {
-            printf("added proc %d , elap: %d  arriv: %d burst:%d\n",i,elapsed,arriv[i],burst[i]);
+            // printf("added proc %d , elap: %d  arriv: %d burst:%d\n",i,elapsed,arriv[i],burst[i]);
             procList[ i ] = Process{ i , arriv[i] , burst[i], burst[i] };
             addedProcesses++;
         }
-        
-        // printf(proc[i]);
     }
     
-    // printf("number of procs %d\n",numberOfProcesses);
     return addedProcesses;
 }
 
@@ -148,17 +124,12 @@ int executeProcess( Process* proc , int elapsed )
 {
     int removedProcesses = 0;
 
-    // printf("executing: %d , burst time: %d\n",proc->pid,proc->remainingTime);
-    // proc->remainingTime--;
-    proc->remainingTime = proc->remainingTime - 1;
-    printf("elapsed: %d executed: %d , bursted time: %d\n",elapsed,proc->pid,proc->remainingTime);
-    // proc->remainingTime--;
-    // printf("executed: %d , bursted time: %d\n",proc->pid,proc->remainingTime);
+    // decrement remaining
+    proc->remainingTime--;
 
     // check if proc is finished
     if ( proc->remainingTime==0 ) {
         removedProcesses++;
-        printf("FINISHED!\n");
         proc->finishTime = elapsed + 1;
     }
     
