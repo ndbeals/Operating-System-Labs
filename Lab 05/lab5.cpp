@@ -83,74 +83,38 @@ void findavgTime(Process proc[], int numberOfProcesses)
     
 }
 
-void sorting(Process proc[] , int startPos , int numberOfProcesses)
+// helper function to calculate waiting time
+inline float waitingTime( Process proc , int elapsed)
 {
-    // Implement a basic sort algorithm which sorts only on the Burst Time value.
-    // insertion sort
-    // define temporary and loop index values;
-    int sortIdx, cmpIdx;
-    Process tmpVal;
-    for(int sortIdx = (startPos + 1); sortIdx < numberOfProcesses; sortIdx++)
-    {
-        // start comparing all elements between 1 and sortIdx.
-        cmpIdx = sortIdx;
-        
-        // sort between 1 to sortIdx, decrementing each time an insertion is made.
-        while( (cmpIdx > 0 ) && ( proc[ cmpIdx - 1 ].remainingTime > proc[ cmpIdx ].remainingTime ) ){
-            tmpVal = proc[ cmpIdx ];
-            proc[ cmpIdx ] = proc[ cmpIdx - 1 ];
-            proc[ cmpIdx - 1 ] = tmpVal;
-            cmpIdx--;
-        }
-    }
-}
-
-
-float turnaroundTime( Process proc )
-{
-    return proc.finishTime - proc.arrivalTime;
-}
-
-float waitingTime( Process proc )
-{
-    return turnaroundTime( proc ) - float(proc.burstTime);
+    return elapsed - proc.arrivalTime;
 }
 
 // Sort by HRRN
 bool sortByHRRN( Process a , Process b , int elapsed)
 {
-    // printf("process A %d \t B: %d\n",a.pid,b.pid);
+    // calculate response ratios
+    float ratioA = 1.0f + float( waitingTime(a , elapsed) / a.burstTime);
+    float ratioB = 1.0f + float( waitingTime(b , elapsed) / b.burstTime);
 
-    float ratioA = 1.0f + float( (elapsed - a.arrivalTime) / a.burstTime);
-    float ratioB = 1.0f + float( (elapsed - b.arrivalTime) / b.burstTime);
-    // float ratioB = 1.5f;
-
-
-    // printf("process A: pid: %i  burst: %i arriv: %i wait: %f ratioL %f \n",a.pid,a.burstTime,a.arrivalTime,waitingTime(a),ratioA);;
-
-    // printf("process burst: %i\n",a.burstTime);
-    // printf("process A %f \t wait %i  burst: %i\n",waitingTime(a),a.burstTime);
-    // printf("process A %f \t B: %f\n",ratioA,ratioB);
+    // if response ratio of process A is higher than that of process B, then A should come before B
     return ratioA > ratioB; 
-
-    // return a.remainingTime < b.remainingTime; // shortest remaining time
 }
 
+// Simple sort to sort by finish times, to display the process list in chronological order
 bool sortByFinishTime( Process a , Process b )
 {
-    printf("finishtime: %i %i\n",a.finishTime,b.finishTime);
     return a.finishTime < b.finishTime;
 }
 
-
+// each milisecond, check to see if there are processes to add.
 int addProcessByTime( Process procList[] , int elapsed ,int numberOfProcesses , int arriv[] , int burst[] )
 {
     int addedProcesses = 0;
 
+    // loop through possible process list, and add eligible ones to the actual list
     for(int i = 0; i < numberOfProcesses; i++)
     {
         if ( arriv[i] == elapsed ) {
-            // printf("adding process: %i burst: %i arriv: %i\n",i, burst[i],arriv[i]);
             procList[ i ] = Process{ i , arriv[i] , burst[i], burst[i] };
             addedProcesses++;
         }
@@ -161,7 +125,6 @@ int addProcessByTime( Process procList[] , int elapsed ,int numberOfProcesses , 
 
 int executeProcess( Process* proc , int elapsed )
 {
-    // printf("Executing pid: %i , elapsed: %i\n",proc->pid,elapsed);
     int removedProcesses = 0;
 
     // decrement remaining time by 1ms
