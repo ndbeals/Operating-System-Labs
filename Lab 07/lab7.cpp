@@ -74,25 +74,19 @@ bool findSafeSequence( int (*need)[R] , int (available)[R] , int* sequence)
         {
             // check if current process can be satisfied (ran) with the current available resources
             bool canRun = compareResourceArray( need[proc] , available );
-            // printf(" test %d  less than: %s\n",sequence[proc],(sequence[proc] < 0)?"true":"false") ;
+            // if the process can run, and hasn't finished yet, append this process to the execution sequence.
             if ( canRun && !finished[proc] ) {
-                success = true;
+                success = true; // tell the outer loop we were successful finding a pr
 
-                // add proc num + 1 to array (kind of a hack to keep track of which processes we've handled. just subtract 1 later)
-                sequence[ safeSeqIdx ] = proc;
-                safeSeqIdx++;
-                finished[ proc ] = true;
+                sequence[ safeSeqIdx ] = proc;  // append to exec sequence the current proc number
+                safeSeqIdx++;                   // increment the amount of processes we've safely executed
+                finished[ proc ] = true;        // Set this process to finished
 
+                // after we "finish" this process, we need to add the resources it needs to the resources available
                 addResourceArray( need[proc] , available );
-
-                // printf("proc: %d safeseqidx: %d canRun: %s , res arr: %d,%d,%d\n",proc,safeSeqIdx,canRun?"true":"false",available[0],available[1],available[2]);
             }
-            
         } 
-        // exit(0);
-        // break;
-    }
-    while(safeSeqIdx < P && success);
+    } while(safeSeqIdx < P && success);
     
 
     return success;
@@ -120,31 +114,33 @@ int main()
         {2, 1, 1},
         {0, 0, 2}};
 
+    // calculate need matrix
     int (*need)[R] = calculateNeedMatrix( allocated , maximum);
     
-
+    // print need matrix
     printf( "Need Matrix: \n");
     for(int i = 0; i < P; i++)
     {
         printf("  [%d,%d,%d]\n",need[i][0],need[i][1],need[i][2]);
     }
 
-    int safeSequence[P];
-    std::fill( &safeSequence[0] , &safeSequence[P] , -1 );
-    bool isSafeState = findSafeSequence( need , available , safeSequence);
 
+    
+    int safeSequence[P];                                                    // initialize a safesequence array the same size as # of processes
+    bool isSafeState = findSafeSequence( need , available , safeSequence);  // Find a safe sequence with the given need matrix and available vector
+
+    // if system is in a safe state, print that, and print the sequencec, if not, print that it's not safe
     if (isSafeState) {
         printf("\nSystem is in a safe state.\nSafe sequence is: ");
 
         for(int seq = 0; seq < P; seq++)
         {
-            // printf("is safe: %s safe seq idx 0: %d \n",isSafeState?"True":"False",safeSequence[seq]);
             if ( seq < (P-1) ) {
-                printf( "P%d, " , safeSequence[ seq ] );
+                printf( "P%d, " , safeSequence[ seq ] ); // print idx 0 to (n-1) where n is array length
             }
             else
             {
-                printf( "P%d\n" , safeSequence[ seq ] );
+                printf( "P%d\n" , safeSequence[ seq ] ); // print last index without final comma
             }
         }
     }
@@ -153,11 +149,5 @@ int main()
         printf("System is in an unsafe state.\n");
     }
     
-
-    
-
-    
-
-    // printf("hello world!\n");
     return 0;
 }
