@@ -60,11 +60,6 @@ void findavgTime(Process proc[], int numberOfProcesses)
 {
     int waitTime[numberOfProcesses], turnaroundTime[numberOfProcesses];
 
-    // sort through process list to make them ascending by pid before executing
-    // std::sort( &proc[0] ,&proc[numberOfProcesses], [](Process a, Process b) {
-        // return a.pid < b.pid;   
-    // });
-
     // Your function to find turnaround time for all processes
     findTurnaroundTime(proc, numberOfProcesses, turnaroundTime);
     // Your function to find waiting time of all processes
@@ -95,12 +90,6 @@ void findavgTime(Process proc[], int numberOfProcesses)
     
 }
 
-// helper function to calculate waiting time
-// inline float waitingTime( Process proc , int elapsed)
-// {
-//     return timeElapsed - proc.arrivalTime;
-// }
-
 bool sortByPID( Process a , Process b )
 {
     return a.pid < b.pid;
@@ -122,7 +111,6 @@ int addProcessByTime( Process procList[] , int alreadyAddedProcesses ,int number
     {
         if ( arriv[i] <= timeElapsed ) {
             procList[ i ] = Process{ i + 1 , arriv[i] , burst[i], burst[i] ,0,0,0};
-            // printf("added proc: %d remainingtime: %d\n ",i,procList[i].remainingTime);
             addedProcesses++;
         }
     }
@@ -134,7 +122,6 @@ int executeProcess( Process* proc )
 {
     if ( proc->remainingTime==0 ) { // trying to execute an already finished (and handled) process, fail gracefully
         return 0;
-        // printf("proc0: %d finished\n",proc->pid);
     }
     timeElapsed++; // increment the time elapsed
     
@@ -142,13 +129,11 @@ int executeProcess( Process* proc )
 
     // decrement remaining time by 1ms
     proc->remainingTime--;
-    // printf("proc1: %d rt: %d ???\n",proc->pid,proc->remainingTime);
     
     // check if proc is finished
     if ( proc->remainingTime==0 ) {
         removedProcesses++;
         proc->completionTime = timeElapsed;
-        // printf("proc2: %d finished\n",proc->pid+1);
     }
 
     return removedProcesses;
@@ -177,8 +162,6 @@ Process* findLargestRemainingTime( Process procList[] , int finished ,int number
         }
     }
 
-    // printf("SELECTED: %d RT: %d\n",lowest->pid+1,lowest->remainingTime);
-
     return lowest;        
 }
 
@@ -195,33 +178,20 @@ int main()
     // Generate Process structs
     Process procList[numberOfProcesses] ;
 
-    int count = 0;
     while( finishedProcesses < numberOfProcesses ){
-    // while( count<41 ){
         // check for processes to add, and add them if so.
         processCount += addProcessByTime( procList , processCount , numberOfProcesses, arriv, burst);
-
-        // if (processCount<1) {
-        //     timeElapsed++;
-        //     printf("what the fuck: %d t: %d\n",processCount,timeElapsed);
-        //     continue;
-        // }
-        
 
         std::sort( &procList[finishedProcesses] , &procList[processCount] , sortByArrivalTime);
 
         // execute process
-        // Process* proc = &procList[finishedProcesses];
         Process* proc = findLargestRemainingTime( procList , finishedProcesses , processCount );
-        // timeElapsed++;
         finishedProcesses += executeProcess( proc );
+        
         printf("Process: %d at time interval: %d\n",proc->pid,timeElapsed-1);
-
-        // printf("Processs: %d at time interval: %d FP: %d   AT: %d RT: %d total numb: %d\n",proc->pid+1,timeElapsed,finishedProcesses,proc->arrivalTime,proc->remainingTime,numberOfProcesses);
-        count++;
     }
     
-        // sort by finish times so the printed list looks nice
+    // sort by finish times so the printed list looks nice
     std::sort( &procList[0], &procList[numberOfProcesses] , sortByPID );
     // std::sort( &proc[0], &proc[numberOfProcesses] , sortByFinishTime );
     // calc avg times.
