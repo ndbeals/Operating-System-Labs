@@ -23,7 +23,6 @@ int timeElapsed = 0;
 int numberOfProcesses = 0;
 int finishedProcesses = 0;
 int processCount = 0;
-// Process procList[];
 
 void findWaitingTime(Process proc[], int numberOfProcesses, int waitTime[] , int turnaroundTime[])
 {
@@ -80,6 +79,8 @@ void findavgTime(Process proc[], int numberOfProcesses)
         avgTurnTime += (float)turnaroundTime[idx];
     }
     
+
+    // print averages and totals
     printf("\nTotal turnaround time   = %.2f ms\n",avgTurnTime);
     avgTurnTime /= numberOfProcesses;
     printf("Average turnaround time = %.2f ms\n",avgTurnTime);
@@ -90,6 +91,7 @@ void findavgTime(Process proc[], int numberOfProcesses)
     
 }
 
+// sortByPID for displaying the list at the end
 bool sortByPID( Process a , Process b )
 {
     return a.pid < b.pid;
@@ -139,11 +141,14 @@ int executeProcess( Process* proc )
     return removedProcesses;
 }
 
+// find the proc with the largest remaining time.
 Process* findLargestRemainingTime( Process procList[] , int finished ,int numberOfProcesses )
 {
+    // set initial lowest RT to -1000
     int RT = -1000;
     Process* lowest;
 
+    // search for a process with the lowest remaiming time left
     for(int pid = 0; pid < numberOfProcesses; pid++)
     {
         if ( procList[pid].remainingTime > RT && procList[pid].remainingTime>0) {
@@ -153,6 +158,7 @@ Process* findLargestRemainingTime( Process procList[] , int finished ,int number
         }
     }
 
+    // once we've found the lowest remaining time, check the process list to see if there are other processes with the same remaining time, if so, then select by earliest arrival time
     for(int pid = 0; pid < numberOfProcesses; pid++)
     {
         if ( lowest->remainingTime == procList[pid].remainingTime && procList[pid].remainingTime>0 ) {
@@ -187,7 +193,7 @@ int main()
         // execute process
         Process* proc = findLargestRemainingTime( procList , finishedProcesses , processCount );
         finishedProcesses += executeProcess( proc );
-        
+
         printf("Process: %d at time interval: %d\n",proc->pid,timeElapsed-1);
     }
     
